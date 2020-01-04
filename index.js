@@ -17,6 +17,10 @@ module.exports = class CopyDMChannelID extends Plugin {
 
     DeveloperModeGroup.default = (originalMethod => (args) => {
       const res = originalMethod(args);
+      if (!res) {
+        return null;
+      }
+
       const channelId = getDMFromUserId(args.id);
       const ButtonMenuItem = res.props.children.type;
 
