@@ -7,6 +7,10 @@ const { Menu } = require('powercord/components');
 const { clipboard } = require('electron');
 
 module.exports = class CopyDMChannelID extends Plugin {
+  get currentUserId () {
+    return window.DiscordNative.crashReporter.getMetadata().user_id;
+  }
+
   async startPlugin () {
     const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
     const useCopyDmChannelIdItem = (channelId) => React.createElement(Menu.MenuItem, {
@@ -17,6 +21,10 @@ module.exports = class CopyDMChannelID extends Plugin {
 
     const DMUserContextMenu = await getModule(m => m.default && m.default.displayName === 'DMUserContextMenu');
     inject('copy-dm-channel-id-isolated', DMUserContextMenu, 'default', (args, res) => {
+      if (args[0].user.id === this.currentUserId) {
+        return res;
+      }
+
       const developerGroup = findInReactTree(res, n => n.props && n.props.children && n.props.children.key === 'devmode-copy-id');
       if (developerGroup && this.settings.get('isolated', false)) {
         if (!Array.isArray(developerGroup)) {
@@ -32,8 +40,12 @@ module.exports = class CopyDMChannelID extends Plugin {
     DMUserContextMenu.default.displayName = 'DMUserContextMenu';
 
     const CopyIDItem = await getModule(m => m.default && m.default.displayName === 'useCopyIdItem');
-    inject('copy-dm-channel-id-global', CopyIDItem, 'default', (args, res) => {
-      const channelId = getDMFromUserId(args[0]);
+    inject('copy-dm-channel-id-global', CopyIDItem, 'default', ([ userId ], res) => {
+      if (userId === this.currentUserId) {
+        return res;
+      }
+
+      const channelId = getDMFromUserId(userId);
       if (channelId && !this.settings.get('isolated', false)) {
         return [ res, useCopyDmChannelIdItem(channelId) ];
       }
