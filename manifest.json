@@ -1,6 +1,6 @@
 {
   "name": "Copy DM Channel ID",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Appends a new action button—\"Copy DM Channel ID\"—under the contextual developer mode group that copies the channel ID of a DM (\"Direct Message\") when pressed; useful for experimental purposes and/or plug-in development.",
   "author": "M|-|4r13y ツ#1051",
   "license": "MIT"
